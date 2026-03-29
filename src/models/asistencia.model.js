@@ -2,77 +2,64 @@ import pool from '../config/db.js';
 
 export const getAllAsistencias = async () => {
   const [rows] = await pool.query(`
-    SELECT a.*, 
-           e.nombre, e.apellido_paterno, e.apellido_materno,
-           e.departamento, e.puesto, e.sucursal
-    FROM asistencia a
-    LEFT JOIN empleado e ON a.id_empleado = e.id_empleado
-    ORDER BY a.fecha DESC, a.hora_entrada DESC
+    SELECT * FROM asistencia ORDER BY FECHA DESC
   `);
   return rows;
 };
 
 export const getAsistenciaById = async (id) => {
   const [rows] = await pool.query(`
-    SELECT a.*, 
-           e.nombre, e.apellido_paterno, e.apellido_materno,
-           e.departamento, e.puesto, e.sucursal
-    FROM asistencia a
-    LEFT JOIN empleado e ON a.id_empleado = e.id_empleado
-    WHERE a.id_asistencia = ?
+    SELECT * FROM asistencia WHERE \`ID-ASISTENCIA\` = ?
   `, [id]);
   return rows[0];
 };
 
-export const getAsistenciasByEmpleado = async (id_empleado) => {
+export const getAsistenciasByTrabajador = async (num_trabajador) => {
   const [rows] = await pool.query(`
-    SELECT * FROM asistencia 
-    WHERE id_empleado = ?
-    ORDER BY fecha DESC
-  `, [id_empleado]);
+    SELECT * FROM asistencia WHERE \`NUM-TRABAJADOR\` = ? ORDER BY FECHA DESC
+  `, [num_trabajador]);
   return rows;
 };
 
 export const getAsistenciasByFecha = async (fecha) => {
   const [rows] = await pool.query(`
-    SELECT a.*, e.nombre, e.apellido_paterno, e.departamento, e.puesto, e.sucursal
-    FROM asistencia a
-    LEFT JOIN empleado e ON a.id_empleado = e.id_empleado
-    WHERE a.fecha = ?
-    ORDER BY a.hora_entrada ASC
+    SELECT * FROM asistencia WHERE FECHA = ? ORDER BY ENTRADA ASC
   `, [fecha]);
   return rows;
 };
 
 export const registrarEntrada = async (data) => {
-  const { id_empleado, fecha, hora_entrada, ubicacion, observaciones } = data;
+  const { NUM_TRABAJADOR, ID_HORARIO, FECHA, ENTRADA } = data;
   const [result] = await pool.query(
-    `INSERT INTO asistencia (id_empleado, fecha, hora_entrada, ubicacion, observaciones)
-     VALUES (?, ?, ?, ?, ?)`,
-    [id_empleado, fecha, hora_entrada, ubicacion, observaciones]
+    `INSERT INTO asistencia (\`NUM-TRABAJADOR\`, \`ID-HORARIO\`, FECHA, ENTRADA)
+     VALUES (?, ?, ?, ?)`,
+    [NUM_TRABAJADOR, ID_HORARIO, FECHA, ENTRADA]
   );
   return result;
 };
 
-export const registrarSalida = async (id, hora_salida) => {
+export const registrarSalida = async (id, SALIDA) => {
   const [result] = await pool.query(
-    `UPDATE asistencia SET hora_salida = ? WHERE id_asistencia = ?`,
-    [hora_salida, id]
+    `UPDATE asistencia SET SALIDA = ? WHERE \`ID-ASISTENCIA\` = ?`,
+    [SALIDA, id]
   );
   return result;
 };
 
 export const updateAsistencia = async (id, data) => {
-  const { fecha, hora_entrada, hora_salida, ubicacion, observaciones } = data;
+  const { NUM_TRABAJADOR, ID_HORARIO, FECHA, ENTRADA, SALIDA, ID_INCIDENCIA } = data;
   const [result] = await pool.query(
-    `UPDATE asistencia SET fecha=?, hora_entrada=?, hora_salida=?, ubicacion=?, observaciones=?
-     WHERE id_asistencia=?`,
-    [fecha, hora_entrada, hora_salida, ubicacion, observaciones, id]
+    `UPDATE asistencia SET 
+     \`NUM-TRABAJADOR\`=?, \`ID-HORARIO\`=?, FECHA=?, ENTRADA=?, SALIDA=?, \`ID-INCIDENCIA\`=?
+     WHERE \`ID-ASISTENCIA\`=?`,
+    [NUM_TRABAJADOR, ID_HORARIO, FECHA, ENTRADA, SALIDA, ID_INCIDENCIA, id]
   );
   return result;
 };
 
 export const deleteAsistencia = async (id) => {
-  const [result] = await pool.query('DELETE FROM asistencia WHERE id_asistencia=?', [id]);
+  const [result] = await pool.query(
+    `DELETE FROM asistencia WHERE \`ID-ASISTENCIA\`=?`, [id]
+  );
   return result;
 };
