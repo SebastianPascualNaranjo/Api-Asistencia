@@ -12,5 +12,6 @@ router.post('/entrada',                   ctrl.registrarEntrada);
 router.patch('/:id/salida',              ctrl.registrarSalida);
 router.put('/:id',                        ctrl.update);
 router.delete('/:id',                     ctrl.remove);
+router.get('/retardos', ctrl.getRetardosPorMes);
 
 export default router;

@@ -63,3 +63,17 @@ export const deleteAsistencia = async (id) => {
   );
   return result;
 };
+export const getRetardosPorMes = async (fechaInicio, fechaFin) => {
+  const [rows] = await pool.query(`
+    SELECT 
+      MONTH(FECHA) AS mes,
+      YEAR(FECHA) AS anio,
+      COUNT(*) AS total_retardos
+    FROM asistencia
+    WHERE ENTRADA > '07:00:00'
+      AND FECHA BETWEEN ? AND ?
+    GROUP BY YEAR(FECHA), MONTH(FECHA)
+    ORDER BY YEAR(FECHA), MONTH(FECHA)
+  `, [fechaInicio, fechaFin]);
+  return rows;
+};

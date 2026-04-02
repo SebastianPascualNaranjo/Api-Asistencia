@@ -62,3 +62,14 @@ export const remove = async (req, res) => {
     res.json({ ok: true, message: 'Registro eliminado' });
   } catch (err) { res.status(500).json({ ok: false, message: err.message }); }
 };
+export const getRetardosPorMes = async (req, res) => {
+  try {
+    const { fechaInicio, fechaFin } = req.query;
+    if (!fechaInicio || !fechaFin)
+      return res.status(400).json({ ok: false, message: 'fechaInicio y fechaFin son requeridos' });
+    const data = await AsistenciaModel.getRetardosPorMes(fechaInicio, fechaFin);
+    res.json({ ok: true, data });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
